@@ -1,0 +1,4 @@
+send bloqueante: que yo puedo sobreescribir el buffer y eso no afecta el envío del mensaje
+receive bloqueante: que yo puedo leer el buffer y el mensaje va a estar
+
+send sincrónico: que el mensaje "llegó al otro proceso". 

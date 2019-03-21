@@ -1,0 +1,6 @@
+Primero, el programa recibe un ejecutable como parámetro, si no tira un mensaje de error "Usage: ...".
+Cuando uno lo ejecuta bien, se genera un proceso padre que hace clone -> crea un proceso hijo (es como fork pero deja al padre ver el contexto del hijo).
+
+A partir de ahí se produce un ciclo en el cual el padre le envía una señal "kill" al hijo a través de SIGURG. Bloquea las señales provenientes del hijo, cambia el handler de dicha señal a NULL y vuelve a habilitarlas (creemos que hace esta secuencia para que nada se queje cuando cambia el handler). Mientras tanto el hijo, cuando recibe la señal de kill, escribe "ya va" por pantalla.
+
+Cuando el contador sigreturn() devuelve 4 (el padre le mandó 4 señales), el comportamiento del hijo cambia y envía una señal kill al padre a través de SIGINT. El padre recibe la señal y se duerme (hace wait). Mientras, el hijo ejecuta el comando que se había pasado como parámetro del ./hai.

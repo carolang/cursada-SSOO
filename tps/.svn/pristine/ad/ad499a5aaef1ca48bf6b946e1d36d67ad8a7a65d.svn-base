@@ -1,0 +1,82 @@
+\section{Read-Write Lock}
+
+Para el control de ejecución concurrente de los distintos threads se implementó la clase RWLock, que contiene la implementación de  locks libres de inanición utilizando mutexes y variables de condición.
+A continuación, se describe la clase, sus variables y funciones.
+\\
+\\
+La clase ofrece cuatro funciones para su utilización. Dos funciones para controlar la lectura, llamadas rlock y runlock, y dos para controlar la escritura, llamadas wlock y wunlock. La implementación de estas funciones utiliza dos mutexes, m y barrera, descriptos a continuación.
+\\
+\\
+Para implementar los locks de lectura y escritura nos basamos en la idea presentada en \emph{The Little Book of Semaphores}, para el problema Reader-Writer (como se lo nombra en el libro).
+Este problema consiste en la lectura y modificación de estructuras de datos compartidos por threads concurrentes. En nuestro caso, la estructura de datos es el tablero, que consiste en \emph{tablero_letra} y \emph{tablero_palabra}.
+Mientras las estructuras son escritas o modificadas es necesario impedir la lectura para otros threads, ya que se corre el riesgo de que obtengan información invalida.
+Sin embargo, la lectura concurrente no presenta este problema.
+\\
+\\
+
+\subsection{Funciones para la lectura}
+
+\begin{algorithmic}[1]
+  \Function{rlock}{}
+	\State m.lock
+	\State barrera.lock
+	\State barrera.unlock
+    \While{\textbf{hayEscritor}}
+		\State wait(noHayEscritores, m);
+    \EndWhile
+	\State lectoresDentro++
+	\State hayAlguien $\leftarrow$ true
+	\State m.unlock
+  \EndFunction
+\end{algorithmic}
+~
+\begin{algorithmic}[1]
+  \Function{runlock}{}
+	\State m.lock
+	\State lectoresDentro--
+	\If{lectoresDentro $=$ 0}
+		\State hayAlguien $\leftarrow$ false
+		\State noHayNadieDentro.signal
+	\EndIf
+	\State m.unlock
+  \EndFunction
+\end{algorithmic}
+~
+El mutex \emph{m} protege a las variables de condición y mutexes usados, de ser sobre-escritos cuando otros procesos hacen uso de los locks. En particular, hace que el cuerpo de las funciones que implementan los locks y unlocks para escitura y lectura sea ejecutado por completo por un thread, antes de poder ser ejecutado por cualquier otro, convirtiendo estas funciones en algo que se comporta atómicamente.\\
+\\
+El lector verifica que no halla ningun escritor esperando por medio de la consulta del mutex \emph{barrera}. Si no hay ningun escritor esperanado a ser atendido, espera que el recurso se libere. Luego se incrementa la variable auxiliar \emph{lectoresDentro} para llevar la cuenta de los lectores. \\
+\\
+Una vez que el lector termina, decrementa \emph{lectoresDentro}. Esta se usa para identificar al último lector, que se encarga de asignar false a la variable \emph{hayAlguien}, esta a su vez utilizada para que el escritor ingrese a la zona crítica. 
+\\
+El mutex \emph{barrera} se utiliza para que, en el caso de que haya llegado un escritor, no se permita la entrada al tablero de más lectores hasta que no se atienda al escritor. Es decir evita la inanición en el sistema.\\
+\\
+\subsection{Funciones para la escritura}
+\begin{algorithmic}[1]
+  \Function{wlock}{}
+	\State m.lock
+	\State barrera.lock
+    \While{\textbf{hayAlguien}}
+		\State wait(noHayNadieDentro, m);
+    \EndWhile
+	\State hayEscritor $\leftarrow$ true
+	\State hayAlguien $\leftarrow$ true
+	\State barrera.unlock
+	\State m.unlock
+  \EndFunction
+\end{algorithmic}
+~
+
+\begin{algorithmic}[1]
+  \Function{wunlock}{}
+	\State m.lock
+	\State hayAlguien $\leftarrow$ false
+	\State hayEscritor $\leftarrow$ false
+	\State noHayEscritores.signal
+	\State noHayNadieDentro.signal
+	\State m.unlock
+  \EndFunction
+\end{algorithmic}
+~
+El escritor, impide que otros lectores continuen, haciendo un lock de la barrera. Luego, espera a que todos los lectores que están leyendo el tablero terminen (\emph{hayAlguien} == false). Setea las variables \emph{hayAlguien} y \emph{hayEscritor} a true y procede.
+Una vez que termina de escribir setea las variables booleanas nombradas anteriormente a false, libera el recurso haciendo signal de las variables de condicion \emph{noHayEscritores_cv} y \emph{noHayNadieDentro_cv} y termina.
+\\

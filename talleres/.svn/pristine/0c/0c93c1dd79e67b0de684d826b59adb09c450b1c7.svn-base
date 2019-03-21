@@ -1,0 +1,27 @@
+Los procesos pueden enviar y recibir señales. Las señales se mandan invocando la función kill(pid, CODIGO), donde pid es el proceso destinatario de la señal y CODIGO es un número entero. Puede ser cualquier número pero hay algunos que por convención tienen una semántica particular. Por ejemplo, los que se usan en los procesos que estamos analizando son:
+* SIGINT: es una señal cuya intención es hacer que el otro proceso se interrumpa.
+* SIGURG: sirve para indicar a un proceso que está recibiendo una señal de alta prioridad.
+* SIGCHLD: el sistema operativo envía esta señal a un proceso cuando uno de sus hijos termina con exit status 0 (sin errores).
+
+Las señales son capturadas por handlers especiales en cada proceso. O sea, el hilo de ejecución del proceso receptor se interrumpe y empieza a ejecutar el handler, hasta que termina y retoma el hilo de ejecución original. El proceso receptor puede haber cambiado el handler por default de alguna señal a una rutina personalizada. Esto se realiza mediante la función rt_sigaction, que recibe por parámetro el código de la señal y la dirección del inicio del handler nuevo.
+
+Ahora, el resumen de la ejecución de hai en particular:
+El programa recibe un ejecutable como parámetro, si no se indica uno, devuelve el mensaje de error "Uso: ./hai commando [argumentos ...]".
+Cuando se lo ejecuta correctamente, se genera un proceso padre que realiza un clone creando un proceso hijo. Clone funciona como fork, con la diferencia de que el proceso padre puede acceder al contexto del proceso hijo.
+
+Luego, de la forma descripta anteriormente, el proceso padre cambia el handler de SIGINT por uno personalizado, y el hijo hace lo propio con SIGURG.
+* El handler de SIGURG del hijo escribe "ya va" por pantalla. Para realizar esta impresion utiliza una llamada al SSOO. El proceso hijo llama a printf, que es una función de C que, por dentro, utiliza una interrupción del sistema operativo (int 0x80) por medio de la cual los programas pueden solicitar servicios al SSOO. En particular, esta función solicita un servicio de escritura, y el SSOO escribe el texto pedido por pantalla.
+* El handler del padre de SIGINT ejecuta wait4(-1, [{WIFEXITED(s) && WEXITSTATUS(s) == 0}], 0, NULL) = pid_hijo. Esto hace que el proceso padre se bloquee, y indique al SSOO que lo desbloquee si alguno de sus procesos hijos termina con status 0, o sea, sin errores.
+
+Luego produce un ciclo en el cual se realizan las siguientes acciones:
+  * El padre espera un segundo (con "nanosleep(1)") y luego ejecuta la función kill(pid_hijo, SIGURG). Esto, como dijimos antes, provoca que el proceso hijo reciba una señal SIGURG y su handler la trate.
+  * Se bloquean las señales de pid_hijo, se cambia el handler de la señal SIGCHLD a NULL y se vuelven a habilitar. Esto sigue esta secuencia en especifico de modo que nada se ejecute durante el cambio de handler. Cambiar el handler quiere decir que cambia el comportamiento del proceso al recibir una señal. En particular NULL indica que al recibir la señal SIGCHLD, no se realizara ninguna accion(*).
+  * Mientras tanto el hijo, recibe la señal SIGURG del proceso padre. Su handler imprime 'ya va!' por pantalla como describimos anteriormente.
+
+Cuando el contador sigreturn() devuelve 4, indicando que el proceso padre envio 4 señales, el comportamiento del proceso hijo cambia. Este invoca kill(pid_padre, SIGINT). El padre recibe dicha señal de pid_hijo y ejecuta el handler correspondiente, descripto arriba.
+
+Concurrentmente, el proceso hijo ejecuta el comando que se había pasado como parámetro del ./hai y luego termina con exit code 0, si no hubo errores. Como su proceso hijo terminó, el SSOO envía al padre una señal de tipo SIGCHLD, que indica que el hijo terminó sin errores. Esto causa que el padre despierte del wait4.
+
+La función wait4 en el proceso padre devuelve pid_hijo, o sea el pid del proceso que terminó bien. Luego de esto el proceso padre termina, a su vez, con exit code 0.
+		
+(*) Una curiosidad: Si se interrumpe la ejecución del proceso hijo con Ctrl+C (SIGINT) en este momento, el proceso padre recibe una señal SIGCHLD por su hijo que terminó, pero la ignora, por lo que se queda imprimiendo 'sup!'.

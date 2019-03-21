@@ -1,0 +1,18 @@
+Primero, el programa recibe un ejecutable como parámetro, si no tira un mensaje de error "Usage: ...".
+Cuando uno lo ejecuta bien, se genera un proceso padre que hace clone -> crea un proceso hijo (es como fork pero deja al padre ver el contexto del hijo).
+
+A partir de ahí se produce un ciclo en el cual:
+  * el padre usa la función kill(pid_hijo, SIGURG). Esta función kill sirve para decirle al SSOO que nuestro proceso quiere mandarle a pid_hijo una señal. Se llama kill pero sirve para mandar señales genéricas. SIGURG es un numerito que por convención significa que la señal corresponde a un evento urgente (VERIFICAR).
+  * Bloquea las señales provenientes de pid_hijo, cambia el handler de dicha señal a NULL y vuelve a habilitarlas (creemos que hace esta secuencia para que nada se queje cuando cambia el handler). Cambiar el handler quiere decir que cambia el comportamiento del proceso al recibir una señal. Cambiarlo a NULL quiere decir "cuando recibas señales de pid_hijo, no hagas nada".
+  * Mientras tanto el hijo, recibe la señal SIGURG (el SSOO le avisa al proceso hijo que recibió SIGURG del padre)
+  * Ante esto, escribe "ya va" por pantalla. Para hacer esto usa una llamada al SSOO. (COMPLETAR)
+
+Cuando el contador sigreturn() devuelve 4 (el padre le mandó 4 señales), el comportamiento del hijo cambia y envía una señal al padre: kill(pid_padre, SIGINT). El padre recibe una señal de pid_hijo con el número SIGINT.
+
+El padre ejecuta:
+wait4(-1, [{WIFEXITED(s) && WEXITSTATUS(s) == 0}], 0, NULL) = pid_hijo
+Esto quiere decir "Duermo, y le pido al SSOO que me despierte si alguno de mis procesos hijos termina, con status 0" (o sea sin errores). 
+
+Mientras, el hijo ejecuta el comando que se había pasado como parámetro del ./hai y luego termina con exit code 0. Como su proceso hijo terminó, el padre recibe una señal de tipo SIGCHLD, que indica que el hijo terminó sin errores. Esto causa que el padre despierte del wait4.
+
+La función wait4 en el proceso padre devuelve pid_hijo, o sea el pid del proceso que terminó bien. Luego de esto el proceso padre termina, a su vez, con exit code 0.

@@ -1,0 +1,14 @@
+\subsubsection{Liu, Chung, and James W. Layland}
+
+
+a) Los autores intentan resolver el problema de diseñar un  scheduler para un computador que desarrolla tareas de monitoreo y control de procesos, en un marco en el cual debe ser garantizada la ejecución en tiempo real.
+
+b) En el caso del algoritmo basado en prioridades fijas, el mínimo de los factores de utilización del procesador para todos los conjuntos de tareas es de 70%. Además, si bien el algoritmo es óptimo, lo es solo en el sentido en que si otro algoritmo estático puede realizar con éxito el scheduling de un conjunto de tareas, el primero también puede, pero esto no dice nada del caso mas general en que el algoritmo es dinámico, lo cual incluye al caso estatico porque puede haber casos donde la mejor asignación dinamica, de un resultado estatico. Esto motiva a buscar un algoritmo más general e inteligente que pueda incrementar ese valor, y posiblemente aumentar la cantidad de conjuntos de tareas para los cuales el algoritmo es factible.
+
+
+c) El teorema 7 no dice que el scheduler es factible si se cumple la condición:
+
+CONDICION
+
+Siendo $C_i$ el run-time de la tarea y $T_i$ los periodos de requerimientos. Esta restricción implica que los tiempos de run-time no pueden ser cercanos a los periodos de requerimiento, ya que si es así dejaria poco margen a las otras tareas para ejecutarse. Por ejemplo, podemos imaginar el caso en que una tarea tiene un run-time igual a su request period, en ese caso la tarea necesitaria todo el tiempo de procesador para ella, no pudiendo nunca asignar las otras tareas.  Si los run-times sin embargo, son notablemente mas pequeños que los request periods, queda mucho tiempo entre la llamada a una tarea y su llamada subsiguiente, pudiendo utilizarse ese tiempo para correr otros procesos.
+

@@ -1,0 +1,5 @@
+# Tareas que se bloquean y que comen CPU
+*2 TaskConsola 5 1 10
+
+@3
+*2 TaskCPU 15

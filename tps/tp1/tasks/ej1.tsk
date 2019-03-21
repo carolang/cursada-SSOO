@@ -1,0 +1,8 @@
+# Tarea interactiva con muchos llamados cortos
+TaskConsola 6 1 3
+
+# Tarea interactiva con pocos llamados largos
+TaskConsola 3 4 6
+
+# Tarea que usa la CPU
+TaskCPU 15

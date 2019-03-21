@@ -1,0 +1,64 @@
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/ioctl.h>
+#include <linux/miscdevice.h>
+
+#define MI_MINOR 40
+
+int numero_actual;
+
+// Estructura del misc device
+static struct file_operations mi_fops;// =
+//{
+        //.read    = esprimo_read
+        //.write   = esprimo_write
+//};
+
+static struct miscdevice mi_dev = {
+	MI_MINOR,
+	"esprimo",
+	&mi_fops
+};
+
+bool esPrimo(int n){
+	// El 1 no es primo
+	if(n==1) return false;
+	
+	int d = 2;
+	while(d*d <= n){
+		if(n%d == 0) return false;
+	}
+	return true;
+}
+
+int esprimo_read(char *buffer,char **buffer_location,off_t offset, 
+                                int bufferLength, int *eof, void *data)
+{
+	
+}
+
+static int __init esprimo_init(void) {
+	printk(KERN_ALERT "Iniciando el modulo esprimo!\n");
+	numero_actual = 0;
+	
+	// Registrar device
+	misc_register(&mi_dev);
+	
+	
+	return 0;
+}
+
+static int __exit esprimo_exit(void) {
+	printk(KERN_ALERT "Saliendo del modulo esprimo!\n");
+	
+	// Limpiar registro del device
+	misc_deregister(&mi_dev);
+	
+	return 0;
+}
+
+// Metadata del modulo
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("aventura clang");
+MODULE_DESCRIPTION("Modulo para saber si un numero es primo o no");

@@ -1,0 +1,82 @@
+#include <vector>
+#include <queue>
+#include "sched_rr.h"
+#include "basesched.h"
+#include <iostream>
+
+using namespace std;
+
+SchedRR::SchedRR(vector<int> argn) {
+	// Round robin recibe la cantidad de cores y sus cpu_quantum por parámetro
+	int cpus = argn[0];
+	int i;
+	// Cargo los quantum de las cpus
+	for(i=1; i<=cpus; i++){
+		quantum.push_back(argn[i]);
+		elapsed_ticks.push_back(0);
+		current_pid.push_back(IDLE_TASK);
+	}
+}
+
+SchedRR::~SchedRR() {
+
+}
+
+void SchedRR::load(int pid) {
+	total++;
+	qty_ready++;
+	ready.push_back(true);
+	processing.push_back(false);
+}
+
+void SchedRR::unblock(int pid) {
+	// Cuando una tarea se debloquea, se pone al final de la cola
+	ready[pid] = true;
+	qty_ready++;
+}
+
+int SchedRR::tick(int cpu, const enum Motivo m) {
+	bool quantum_change=false;
+	
+	elapsed_ticks[cpu]++;
+	// Se fija si cambia el quantum en este tick
+	if(elapsed_ticks[cpu] == quantum[cpu]){
+		elapsed_ticks[cpu] = 0;
+		quantum_change = true;
+	}
+	
+	// Si no hay cambio de quantum puede ser que siga la misma o que pase a IDLE_TASK
+	if(!quantum_change){
+		if(m == TICK){
+			return current_pid[cpu];
+		}
+		else{
+			int cur = current_pid[cpu];
+			if(cur == IDLE_TASK) return IDLE_TASK;
+			
+			ready[cur] = false;
+			qty_ready--;
+			
+			current_pid[cpu] = IDLE_TASK;
+			return IDLE_TASK;
+		}
+	}
+	
+	// A partir de aca hay cambio de quantum
+	if(m == EXIT || m == BLOCK){
+		// Si hay que bloquear la tarea lo hacemos
+		if(current_pid[cpu] != IDLE_TASK){
+			int cur = current_pid[cpu];
+			ready[cur] = false;
+			qty_ready--;
+		}
+	}
+	
+	int sig = next(cpu);
+	
+	
+}
+
+int SchedRR::next(int cpu) {
+	
+}

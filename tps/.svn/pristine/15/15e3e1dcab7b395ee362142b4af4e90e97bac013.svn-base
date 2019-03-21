@@ -1,0 +1,40 @@
+#include "sched_fixed.h"
+#include <iostream>
+
+using namespace std;
+
+SchedFixed::SchedFixed(vector<int> argn) {
+}
+
+SchedFixed::~SchedFixed() {
+}
+
+void SchedFixed::initialize() {
+}
+
+void SchedFixed::load(int pid) {
+    total++;
+    ready.push_back(true);
+    processing.push_back(false);
+}
+
+void SchedRR::block(int pid){
+	if(pid == IDLE_TASK) return;
+	ready[pid] = false;
+}
+
+void SchedRR::unblock(int pid) {
+	ready[pid] = true;
+}
+
+int SchedFixed::tick(int cpu, const enum Motivo m) {
+    elapsed_tick++;
+    if (elapsed_tick == quantum) {
+    	//CAMBIAR TAREA
+    	elapsed_ticks= 0;
+		quantum_change = true;
+    }else if(m == EXIT || m == BLOCK){
+		block(current_pid);
+	}
+    return -2;
+}

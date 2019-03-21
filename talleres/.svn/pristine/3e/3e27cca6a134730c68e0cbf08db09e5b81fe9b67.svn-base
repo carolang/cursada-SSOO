@@ -1,0 +1,1 @@
+cmd_/home/alumno/remoto/esprimo.ko := ld -r -m elf_i386 -T /usr/src/linux-headers-3.2.0-29-generic-pae/scripts/module-common.lds --build-id  -o /home/alumno/remoto/esprimo.ko /home/alumno/remoto/esprimo.o /home/alumno/remoto/esprimo.mod.o

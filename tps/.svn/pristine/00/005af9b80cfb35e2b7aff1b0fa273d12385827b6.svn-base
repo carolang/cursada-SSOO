@@ -1,0 +1,33 @@
+#include "sched_fixed.h"
+#include <iostream>
+
+using namespace std;
+
+SchedFixed::SchedFixed(vector<int> argn) {
+}
+
+SchedFixed::~SchedFixed() {
+}
+
+void SchedFixed::initialize() {
+}
+
+void SchedFixed::load(int pid) {
+    total++;
+    ready.push_back(true);
+    processing.push_back(false);
+}
+
+void SchedFixed::block(int pid){
+	if(pid == IDLE_TASK) return;
+	ready[pid] = false;
+}
+
+void SchedFixed::unblock(int pid) {
+	ready[pid] = true;
+}
+
+int SchedFixed::tick(int cpu, const enum Motivo m) {
+    
+    return -2;
+}

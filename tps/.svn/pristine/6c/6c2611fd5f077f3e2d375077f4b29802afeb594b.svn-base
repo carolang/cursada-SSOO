@@ -1,0 +1,22 @@
+\section{Ejercicio 5}
+
+
+a) Los autores intentan resolver el problema de diseñar un  scheduler para un computador que desarrolla tareas periódicas de monitoreo y control de procesos, en un marco en el cual debe ser garantizada la ejecución en tiempo real.  Es decir, en un sistema que cumple $n$ tareas de monitoreo/control, donde cada una de ellas se ejecuta cada cierto tiempo $T_i$, y tiene una duración de $C_i$ el scheduler debe ser capaz de , para cada tarea $t_i$, ejecutarla antes de que llegue a su deadline(tiempo entre dos request de una misma tarea). Este objetivo estudia en el marco de las siguientes restricciones.
+\begin{itemize} 
+\item Los requests para las tareas que tienen deadline estrictos son periodicos a intervalos constantes.  
+\item Los deadlines consisten en que la ejecucion de una tarea debe terminar antes de que se produzca el siguiente request para esta.
+\item Las tareas son independientes entre si.
+\item Los run-time's de cada tarea son constantes (sin contar interrupciones)
+\item Las tareas no periodicas en el sistema son especiales. Son tareas de incialización o manejo de errores, no tienen deadlines estrictos, y desplazan a las tareas periodicas en el tiempo mientras ellas estan corriendo.
+\end{itemize} 
+Asumiendo estos puntos es posible deducir y demostrar resultados analíticos acerca de los posibles métodos de scheduling que puedan cumplir los requerimientos mencionados.
+
+b) En el caso del algoritmo basado en prioridades fijas, el mínimo de los factores de utilización del procesador para todos los conjuntos de tareas es de 70%. Además, si bien el algoritmo es óptimo, lo es solo en el sentido en que si otro algoritmo estático puede realizar con éxito el scheduling de un conjunto de tareas, el primero también puede, pero esto no dice nada del caso mas general en que el algoritmo es dinámico, lo cual incluye al caso estatico porque puede haber casos donde la mejor asignación dinamica, de un resultado estatico. Esto motiva a buscar un algoritmo más general e inteligente que pueda incrementar ese valor, y posiblemente aumentar la cantidad de conjuntos de tareas para los cuales el algoritmo es factible.
+
+
+c) El teorema 7 nos dice que el scheduler es factible si se cumple la condición:
+
+\center{$\frac{C_1}{ T_1} + \frac{C_2}{ T_2} + \frac{C_3}{ T_3} + ... + \frac{C_n}{ T_n}  \leq 1$}
+
+Siendo $C_i$ el run-time de la tarea y $T_i$ los periodos de requerimientos. Esta restricción implica que los tiempos de run-time no pueden ser cercanos a los periodos de requerimiento, ya que si es así dejaria poco margen a las otras tareas para ejecutarse. Por ejemplo, podemos imaginar el caso en que una tarea tiene un run-time igual a su request period, en ese caso la tarea necesitaria todo el tiempo de procesador para ella, no pudiendo nunca asignar las otras tareas.  Si los run-times sin embargo, son notablemente mas pequeños que los request periods, queda mucho tiempo entre la llamada a una tarea y su llamada subsiguiente, pudiendo utilizarse ese tiempo para correr otros procesos.
+

@@ -1,0 +1,54 @@
+clone(child_stack=0, flags=CLONE_CHILD_CLEARTID|CLONE_CHILD_SETTID|SIGCHLD, child_tidptr=0) = 5028
+rt_sigaction(SIGINT, {0x8048615, [INT], SA_RESTART}, {SIG_DFL, [], 0}, 8) = 0
+rt_sigprocmask(SIG_BLOCK, [CHLD], [], 8) = 0
+rt_sigaction(SIGCHLD, NULL, {SIG_DFL, [], 0}, 8) = 0
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+nanosleep({1, 0}, 0xffa1162c)           = 0
+write(1, "sup!\n", 5sup!
+)                   = 5
+kill(5028, SIGURG)                      = 0
+ya va!
+rt_sigprocmask(SIG_BLOCK, [CHLD], [], 8) = 0
+rt_sigaction(SIGCHLD, NULL, {SIG_DFL, [], 0}, 8) = 0
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+nanosleep({1, 0}, 0xffa1162c)           = 0
+write(1, "sup!\n", 5sup!
+)                   = 5
+kill(5028, SIGURGya va!
+)                      = 0
+rt_sigprocmask(SIG_BLOCK, [CHLD], [], 8) = 0
+rt_sigaction(SIGCHLD, NULL, {SIG_DFL, [], 0}, 8) = 0
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+nanosleep({1, 0}, 0xffa1162c)           = 0
+write(1, "sup!\n", 5sup!
+)                   = 5
+kill(5028, SIGURGya va!
+)                      = 0
+rt_sigprocmask(SIG_BLOCK, [CHLD], [], 8) = 0
+rt_sigaction(SIGCHLD, NULL, {SIG_DFL, [], 0}, 8) = 0
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+nanosleep({1, 0}, 0xffa1162c)           = 0
+write(1, "sup!\n", 5sup!
+)                   = 5
+kill(5028, SIGURGya va!
+)                      = 0
+rt_sigprocmask(SIG_BLOCK, [CHLD], [], 8) = 0
+rt_sigaction(SIGCHLD, NULL, {SIG_DFL, [], 0}, 8) = 0
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+nanosleep({1, 0}, 0xffa1162c)           = 0
+write(1, "sup!\n", 5sup!
+)                   = 5
+kill(5028, SIGURGya va!
+)                      = 0
+--- SIGINT {si_signo=SIGINT, si_code=SI_USER, si_pid=5028, si_uid=1000} ---
+wait4(-1, .
+./salida.txt
+./clase.pdf
+./launch.c
+./hai
+./apunte.pdf
+./enunciado.pdf
+[{WIFEXITED(s) && WEXITSTATUS(s) == 0}], 0, NULL) = 5028
+--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=5028, si_status=0, si_utime=500, si_stime=0} ---
+exit_group(0)                           = ?
++++ exited with 0 +++
